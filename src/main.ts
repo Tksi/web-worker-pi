@@ -1,14 +1,16 @@
 import './style.css';
+console.time('Timer');
+const worker = new Worker(new URL('./worker.ts', import.meta.url));
 
 const epoch = 1e8;
-let inCircles = 0;
 
-console.time('Timer');
-for (let i = 0; i < epoch; i++) {
-  if (Math.hypot(Math.random(), Math.random()) <= 1) {
-    inCircles++;
-  }
-}
+worker.postMessage({ epoch: epoch });
+
+const inCircles = new Promise((resolve) => {
+  worker.addEventListener('message', ({ data: { inCircles } }) => {
+    resolve(inCircles);
+  });
+});
+
+console.log(await inCircles);
 console.timeEnd('Timer');
-
-console.log((4 * inCircles) / epoch);
