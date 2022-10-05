@@ -1,17 +1,15 @@
+import { Worker } from 'worker_threads';
+import os from 'os';
+
 console.time('Timer');
 
 const epoch = 1e8;
-const thread = navigator.hardwareConcurrency;
+const thread = os.cpus().length;
 if (epoch % thread) console.warn('epoch not divisible by thread');
 
 const workers = Array(thread)
   .fill('')
-  .map(
-    () =>
-      new Worker(new URL('worker.ts', import.meta.url).href, {
-        type: 'module',
-      })
-  );
+  .map(() => new Worker('./worker.mjs'));
 
 for (const worker of workers) {
   worker.postMessage({ epoch: (epoch / thread) | 0 });
@@ -22,11 +20,10 @@ const inCircles = (
     workers.map(
       (worker) =>
         new Promise((resolve) => {
-          worker.addEventListener('message', ({ data: { inCircles } }) => {
+          worker.on('message', ({ inCircles }) => {
             resolve(inCircles);
-            worker.terminate();
           });
-        }) as Promise<number>
+        })
     )
   )
 ).reduce((a, b) => a + b);
@@ -34,5 +31,3 @@ const inCircles = (
 console.log((inCircles * 4) / epoch);
 
 console.timeEnd('Timer');
-
-export {};
