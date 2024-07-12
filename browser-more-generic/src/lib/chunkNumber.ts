@@ -1,5 +1,6 @@
 /**
  * 合計がnumberになるようにsizeで分割する
+ * 
  * @param number 分割する元の数
  * @param size 分割数
  * @returns 分割した数を配列にして返す
