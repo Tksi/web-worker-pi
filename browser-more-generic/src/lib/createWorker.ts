@@ -1,7 +1,12 @@
+/**
+ * 関数をWorker可してPromiseラップ
+ * 
+ * @param fn Workerで実行する関数
+ * @returns PromiseラップしたWorker
+ */
 export const createWorker = <T extends any[], R>(
   fn: (...args: T) => R,
 ): ((...args: T) => Promise<R>) => {
-  // Workerコードを構築
   const workerCode = `
     self.addEventListener('message', function(e) {
       const fn = ${fn.toString()};
