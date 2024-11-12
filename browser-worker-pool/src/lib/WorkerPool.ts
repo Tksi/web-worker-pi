@@ -3,7 +3,7 @@ export class WorkerPool<Result> {
     worker: Worker;
     isBusy: boolean;
   }[] = [];
-  #messageQueue: Parameters<Worker['postMessage']>[] = [];
+  #messageQueue: [unknown, Transferable[] | undefined][] = [];
   #onEnd?: () => void;
   #isFixed: boolean = false;
 
@@ -44,8 +44,8 @@ export class WorkerPool<Result> {
     return this.#workers.find(({ isBusy }) => !isBusy);
   }
 
-  add(...message: Parameters<Worker['postMessage']>) {
-    this.#messageQueue.push(message);
+  add(message: unknown, transfer?: Transferable[]) {
+    this.#messageQueue.push([message, transfer]);
     this.#run();
   }
 
@@ -59,6 +59,7 @@ export class WorkerPool<Result> {
       const idleWorker = this.#idleWorker;
       const message = this.#messageQueue.shift()!;
       idleWorker.isBusy = true;
+      // @ts-expect-error TypeScriptの型がおかしい
       idleWorker.worker.postMessage(...message);
     }
 

@@ -14,7 +14,7 @@ const countInCircle = (epoch: number): number => {
   return inCircles;
 };
 
-const epoch = 1e7;
+const epoch = 1e8;
 
 console.time('Single Thread');
 console.log((countInCircle(epoch) * 4) / epoch);
