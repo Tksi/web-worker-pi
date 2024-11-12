@@ -16,7 +16,7 @@ export class WorkerPool<Result> {
     this.#onEnd = onEnd;
 
     for (let i = 0; i < size; i++) {
-      const worker = new Worker(workerUrl);
+      const worker = new Worker(workerUrl, { type: 'module' });
       worker.addEventListener('message', ({ data }: { data: Result }) => {
         onMessage?.(data);
         const thisWorker = this.#workers.find(({ worker: w }) => w === worker);
